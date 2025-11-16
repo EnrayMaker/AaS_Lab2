@@ -1,12 +1,7 @@
-#include <complex>
-#include <cstddef>
 #include <iostream>
-#include <ostream>
 #include <stdexcept>
-#include <cmath>
-#include <type_traits>
+#include <random>
 
-// Точность для сравнения вещественных чисел
 
 template<typename T>
 struct Node
@@ -76,6 +71,23 @@ public:
         deep_copy(other);
     }
 
+    explicit LinkedList(size_t count, const T& min_val = T(), const T& max_val = T()) : head(nullptr), size(0) {
+        std::mt19937 gen(static_cast<unsigned>(std::time(nullptr))); // Генератор, Приводит к int, Время
+
+        if constexpr (std::is_floating_point_v<T>) {
+            std::uniform_real_distribution<T> dist(min_val, max_val);
+            for (size_t i = 0; i < count; ++i) {
+                push_tail(dist(gen));
+            }
+
+        } else {
+            std::uniform_int_distribution<int> dist(static_cast<int>(min_val), static_cast<int>(max_val));
+            for (size_t i = 0; i < count; ++i) {
+                push_tail(static_cast<T>(dist(gen)));
+            }
+        }
+    }
+
     ~LinkedList() {
         clear();
     }
@@ -91,42 +103,27 @@ public:
     // Добавление элемента в конец списка
     void push_tail(const T& value) {
         Node<T>* new_node = new Node<T>(value);
-        
         if (head == nullptr) {
             head = new_node;
             head->next = head;
         } else {
-            Node<T>* current = head;
-            while (current->next != head) {
-                current = current->next;
+            Node<T>* tail = head;
+            while (tail->next != head) {
+                tail = tail->next;
             }
-            current->next = new_node;
+            tail->next = new_node;
             new_node->next = head;
         }
         ++size;
     }
-
+    // push_tail для списка в конец
     void push_tail(const LinkedList& other) {
         if (other.size == 0) return;
-        if (size == 0) {
-            deep_copy(other);
-            return;
-        }
-        
-        Node<T>* tail = head;
-        while (tail->next != head) {
-            tail = tail->next;
-        }
-        
         Node<T>* other_current = other.head;
         do {
-            tail->next = new Node<T>(other_current->data);
-            tail = tail->next;
+            push_tail(other_current->data);
             other_current = other_current->next;
         } while (other_current != other.head);
-        
-        tail->next = head;
-        size += other.size;
     }
 
     void push_head(const T& value) {
@@ -239,35 +236,35 @@ public:
         return value;
     }
 
-    void delete_node(const T& value) {
+void delete_node(const T& value) {
         if (head == nullptr) return;
-        
-        // Специальный случай: все элементы равны value
+
+        // Проверяем, все ли элементы равны value
         bool all_equal = true;
-        Node<T>* current = head;
+        Node<T>* check = head;
         do {
-            if (current->data != value) {
+            if (check->data != value) {
                 all_equal = false;
                 break;
             }
-            current = current->next;
-        } while (current != head);
-        
+            check = check->next;
+        } while (check != head);
+
         if (all_equal) {
             clear();
             return;
         }
-        
+
         Node<T>* curr = head;
         Node<T>* prev = nullptr;
-        
-        // Находим предыдущий элемент перед head
-        while (prev == nullptr || prev->next != head) {
-            if (prev == nullptr) prev = head;
-            if (prev->next == head) break;
-            prev = prev->next;
+
+        // Находим узел перед head
+        Node<T>* tail = head;
+        while (tail->next != head) {
+            tail = tail->next;
         }
-        
+        prev = tail;
+
         do {
             if (curr->data == value) {
                 if (curr == head) {
@@ -288,12 +285,12 @@ public:
         } while (curr != head && size > 0);
     }
 
-    // Операция доступа по индексу (для чтения)
+    // Операция доступа по индексу константный
     const T& operator[](size_t index) const {
         return get_node(index)->data;
     }
     
-    // Операция доступа по индексу (для записи)
+    // Операция доступа по индексу 
     T& operator[](size_t index) {
         return get_node(index)->data;
     }

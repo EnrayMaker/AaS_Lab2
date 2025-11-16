@@ -414,7 +414,7 @@ using namespace std;
 
 int main()
 {
-    std::cout << "=== Демонстрация Задания 2: Разворот списка ===\n\n";
+    std::cout << "=== Заданиe 2: Разворот списка ===\n\n";
 
     // Создаём список: 10->- 20 -> 30 -> 40
     LinkedList<int> list;
@@ -425,14 +425,12 @@ int main()
 
     std::cout << "Исходный список: ";
     list.print(); // 10 20 30 40
-
-    // Разворачиваем
     list.reverse();
 
     std::cout << "После разворота: ";
     list.print(); // 40 30 20 10
 
-    // Проверка: добавим ещё элемент и развернём снова
+    // Добавим ещё элемент и развернём снова
     list.push_tail(50);
     std::cout << "Добавили 50: ";
     list.print(); // 40 30 20 10 50
@@ -441,25 +439,25 @@ int main()
     std::cout << "Ещё раз развернули: ";
     list.print(); // 50 10 20 30 40
 
-    // Проверка на списке из 1 элемента
+    // 1 элемент
     LinkedList<int> single;
     single.push_tail(999);
     std::cout << "\nСписок из 1 элемента: ";
-    single.print(); // 999
+    single.print(); 
 
     single.reverse();
     std::cout << "После reverse(): ";
-    single.print(); // 999 (не изменился)
+    single.print();
 
     // Пустой список
     LinkedList<int> empty;
     std::cout << "\nПустой список: ";
-    empty.print(); // List is empty
+    empty.print(); 
 
     empty.reverse();
     std::cout << "После reverse(): ";
-    empty.print(); // List is empty
+    empty.print(); 
 
-    std::cout << "\nЗадание 2 выполнено успешно!\n";
+    std::cout << "\nЗадание 2 выполнено\n";
     return 0;
 }
